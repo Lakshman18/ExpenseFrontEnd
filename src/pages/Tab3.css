@@ -1,0 +1,66 @@
+ion-content{
+    --ion-background-color:#111D12;
+    --ion-text-color: #ffffff;  
+}
+
+ion-list-header {
+    --background: #404040;
+    --color: #fff;
+  
+    --border-width: 0 0 4px 0;
+    --border-color: #52ffe4;
+    --border-style: double;
+}
+
+ion-card-header.ios {
+    display: flex;
+    flex-flow: column-reverse;
+}
+.buttonClr{
+    --color: #949191f8;
+}
+
+ion-badge {
+    --background: #404040;
+    --color: white;
+    --padding-end: 20px;
+    --padding-start: 20px;
+}
+
+.cardBudget{
+    color: #52ffe4;
+}
+
+ion-fab-button::part(native) {
+    background-color: #52ffe4;
+    /* border-radius: 15px; */
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,.3), 0px 1px 3px 1px rgba(0,0,0,.15);
+    color: black;
+}
+
+ion-datetime-button::part(native) {
+    background: #404040;
+    /* color:#52ffe4; */
+}
+
+.addLabel{
+    color:#52ffe4 !important;
+}
+
+/* ion-item.item-has-focus > ion-label{
+    color: #52ffe4  !important;
+}
+*/
+ion-item.item-has-focus {
+    --highlight-background: #52ffe4;
+}  
+
+.footer {
+    /* position:fixed; */
+    /* bottom:0;
+    height:50px; */
+    /* background: #52ffe4 ; */
+    --color: #000000f8;
+    --background: #52ffe4;
+ } 
+ 
