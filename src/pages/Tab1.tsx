@@ -34,6 +34,7 @@ const Tab1: React.FC = () => {
   const history = useHistory();
   const TripList = useSelector((state: AppStatDto) => state.trip.tripList)
   const addTrip = useSelector((state: AppStatDto) => state.trip.addTrip)
+  const [isLoad, setIsLoad] = useState(true);
 
   const [tripFormData, setTripFormData] = useState<TripSummaryData>(INITIAL_FORM_STATE)
 
