@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import { IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle } from '@ionic/react';
+import { IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent } from '@ionic/react';
 import { IonIcon} from '@ionic/react';
-import { arrowForwardOutline, add } from 'ionicons/icons';
+import { arrowForwardOutline, add, cashOutline } from 'ionicons/icons';
 import './Tab1.css';
 import { IonButtons, IonButton, IonModal} from '@ionic/react';
 import { IonItem, IonLabel } from '@ionic/react';
@@ -15,6 +15,7 @@ import {useHistory} from 'react-router-dom';
 import { AppStatDto, TripSummaryData } from '../models'
 import { tripActions } from '../redux/actions'
 import { ACTION_STATUS } from '../constants'
+import GridLoader from "react-spinners/ClipLoader";
 
 const INITIAL_FORM_STATE: TripSummaryData = {
   _id: '',
@@ -42,11 +43,26 @@ const Tab1: React.FC = () => {
   useEffect(() => {
     dispatch(tripActions.getTrips() )
   }, [])
+ 
+  React.useEffect(() => {
+    if (TripList.isLoading === true) {
+      setIsLoad(true)
+    }else if (TripList.isLoading === false) {
+      setIsLoad(false)
+    }
+  }, [TripList.status])
 
   React.useEffect(() => {
     if (addTrip.status === ACTION_STATUS.SUCCESS) {
       dispatch(tripActions.getTrips() )
       setIsAddOpen(false)
+      presentToast('Saved Successfully','top', 'success')
+    }
+
+    if (addTrip.isLoading === true) {
+      setIsLoad(true)
+    }else if (addTrip.isLoading === false) {
+      setIsLoad(false)
     }
   }, [addTrip.status])
 
@@ -59,18 +75,29 @@ const Tab1: React.FC = () => {
   }
 
   function onAddAccept(e:any){
-    // const _validatedData = validatedData as TripSummaryData
-    // setTripFormData(_validatedData)
-    e.preventDefault()
-    const payload: TripSummaryData = {
-      _id: tripFormData._id,
-      name: tripFormData.name,
-      fromDate: tripFormData.fromDate,
-      toDate: tripFormData.toDate,
-      budget: tripFormData.budget
+    e.preventDefault() 
+    if(tripFormData.fromDate === ''){
+      const d = new Date();
+      tripFormData.fromDate = d.toString();
     }
-    dispatch(tripActions.saveUpdateTrip(payload))
-    presentToast('Saved Successfully','top', 'success')
+    if(tripFormData.toDate === ''){
+      const d = new Date();
+      tripFormData.toDate = d.toString();
+    }
+
+    if(tripFormData.name === '' || tripFormData.budget <1  ){
+      presentToast('Invalid data','top', 'danger')
+    }
+    else{
+      const payload: TripSummaryData = {
+        _id: tripFormData._id,
+        name: tripFormData.name,
+        fromDate: tripFormData.fromDate,
+        toDate: tripFormData.toDate,
+        budget: tripFormData.budget
+      }
+      dispatch(tripActions.saveUpdateTrip(payload))
+    }
   }
 
   const presentToast = (message:string, position: 'top' | 'middle' | 'bottom', theme: 'success' | 'danger') => {
@@ -102,85 +129,91 @@ const Tab1: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader  >
         <IonToolbar>
           <IonTitle>Trips</IonTitle>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Trips</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
         {
-          TripList.data.map((item) => {
-            return  <IonCard onClick={() =>  tripDetailView(item._id)} key={item._id}>
-                <IonCardHeader>
-                  <IonCardTitle >{item.name}</IonCardTitle>
-                  <IonCardSubtitle>
-                    {item.fromDate.split("T")[0]}
-                    <IonIcon icon={arrowForwardOutline} className="cardIconClr" size="small" style={{marginBottom:"-4px", marginLeft:"10px", marginRight:"10px"}}></IonIcon> 
-                    {item.toDate.split("T")[0]}
-                  </IonCardSubtitle>
+          isLoad
+          ?
+          <div className="loader">
+              <GridLoader color="#52ffe4" />
+          </div>
+          :
+          <>
+            {
+              TripList.data.map((item) => {
+                return  <IonCard onClick={() =>  tripDetailView(item._id)} key={item._id}>
+                    <IonCardHeader>
+                      <IonCardTitle >{item.name}</IonCardTitle>
+                      <IonCardSubtitle>
+                        {item.fromDate.split("T")[0]}
+                        <IonIcon icon={arrowForwardOutline} className="cardIconClr" size="small" style={{marginBottom:"-4px", marginLeft:"10px", marginRight:"10px"}}></IonIcon> 
+                        {item.toDate.split("T")[0]}
+                      </IonCardSubtitle> 
+                    </IonCardHeader>
 
-                  <IonCardSubtitle>
-                    {item.budget}
-                  </IonCardSubtitle>
-                </IonCardHeader>
-              </IonCard>
-          })
+                    <IonCardContent>
+                    <IonIcon icon={cashOutline} className="cardIconClr" size="small" style={{marginBottom:"-4px", marginLeft:"0px", marginRight:"0px"}}></IonIcon> 
+
+                      <span className="cardBudget">  </span>{item.budget}
+                    </IonCardContent>
+                  </IonCard>
+              })
+            }
+
+            <IonFab style={{position:'fixed', bottom:'50px', right:'30px'}}>
+              <IonFabButton onClick={() => onAddClick()}>
+                <IonIcon icon={add} ></IonIcon>
+              </IonFabButton>
+            </IonFab>
+
+            <IonModal isOpen={isAddOpen} className="modal-wrapper">
+              <IonHeader>
+                <IonToolbar>
+                  <IonTitle>Add</IonTitle>
+                  <IonButtons slot="end">
+                    <IonButton onClick={() => closeModal()}>Close</IonButton>
+                  </IonButtons>
+                </IonToolbar>
+              </IonHeader>
+              <IonContent className="ion-padding">
+                <IonList>
+                  <IonItem>
+                    <IonLabel position="stacked" className="addLabel">Trip Name</IonLabel>
+                    <IonInput clearInput={true} name='name' onIonInput={(e: any) => handleChange(e)} ></IonInput>
+                  </IonItem>
+
+                  <IonItem>
+                    <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>From Date</IonLabel>
+                    <IonDatetimeButton  onClick={()=>setIsDateModalOpen(true)} datetime="datetime" style={{marginTop:'10px'}}></IonDatetimeButton>
+          
+                    <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
+                      <IonDatetime id="datetime" name='fromDate' onIonChange={(e: any) => handleChange(e)} ></IonDatetime>
+                    </IonModal>
+                  </IonItem>
+
+                  <IonItem>
+                    <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>To Date</IonLabel>
+                    <IonDatetimeButton  onClick={()=>setIsDateModalOpen(true)} datetime="datetime1" style={{marginTop:'10px'}}></IonDatetimeButton>
+          
+                    <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
+                      <IonDatetime id="datetime1" name='toDate' onIonChange={(e: any) => handleChange(e)} ></IonDatetime>
+                    </IonModal>
+                  </IonItem>              
+                  <IonItem>
+                    <IonLabel position="stacked" className="addLabel">Budget</IonLabel>
+                    <IonInput clearInput={true} type="number" name='budget' onIonInput={(e: any) => handleChange(e)} ></IonInput>
+                  </IonItem>
+                </IonList>
+                <IonButton expand="block" className="footer" onClick={onAddAccept}>Save</IonButton>
+              </IonContent>
+            </IonModal>
+          </>
         }
-
-        <IonFab style={{position:'absolute', bottom:'100px', right:'30px'}}>
-          <IonFabButton onClick={() => onAddClick()}>
-            <IonIcon icon={add} ></IonIcon>
-          </IonFabButton>
-        </IonFab>
-
-        <IonModal isOpen={isAddOpen} className="modal-wrapper">
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Add</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => closeModal()}>Close</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonList>
-              <IonItem>
-                <IonLabel position="stacked" className="addLabel">Trip Name</IonLabel>
-                <IonInput clearInput={true} name='name' onIonInput={(e: any) => handleChange(e)} ></IonInput>
-              </IonItem>
-
-              <IonItem>
-                <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>From Date</IonLabel>
-                <IonDatetimeButton  onClick={()=>setIsDateModalOpen(true)} datetime="datetime" style={{marginTop:'10px'}}></IonDatetimeButton>
-      
-                <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
-                  <IonDatetime id="datetime" name='fromDate' onIonChange={(e: any) => handleChange(e)} ></IonDatetime>
-                </IonModal>
-              </IonItem>
-
-              <IonItem>
-                <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>To Date</IonLabel>
-                <IonDatetimeButton  onClick={()=>setIsDateModalOpen(true)} datetime="datetime1" style={{marginTop:'10px'}}></IonDatetimeButton>
-      
-                <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
-                  <IonDatetime id="datetime1" name='toDate' onIonChange={(e: any) => handleChange(e)} ></IonDatetime>
-                </IonModal>
-              </IonItem>              
-              <IonItem>
-                <IonLabel position="stacked" className="addLabel">Budget</IonLabel>
-                <IonInput clearInput={true} type="number" name='budget' onIonInput={(e: any) => handleChange(e)} ></IonInput>
-              </IonItem>
-            </IonList>
-            <IonButton expand="block" className="footer" onClick={onAddAccept}>Save</IonButton>
-          </IonContent>
-        </IonModal>
 
       </IonContent>
     </IonPage>

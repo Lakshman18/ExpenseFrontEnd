@@ -56,11 +56,11 @@ const App: React.FC = () => (
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon aria-hidden="true" icon={triangle} />
+            <IonIcon aria-hidden="true" icon={square} />
             <IonLabel>Trips</IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab2" href="/tab2" disabled>
-            <IonIcon aria-hidden="true" icon={ellipse} />
+            <IonIcon aria-hidden="true" icon={square} />
             <IonLabel> </IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab3" href="/tab4" disabled>

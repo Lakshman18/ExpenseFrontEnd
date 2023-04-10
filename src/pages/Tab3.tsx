@@ -18,6 +18,7 @@ import { AppStatDto, TripSummaryData, TripExpenseDataSet, TripExpenseData } from
 import {useHistory} from 'react-router-dom';
 import { ACTION_STATUS } from '../constants'
 import { tripActions } from '../redux/actions/trip.action';
+import GridLoader from "react-spinners/ClipLoader";
 
 const Tab3: React.FC = () => {
   
@@ -94,7 +95,7 @@ const Tab3: React.FC = () => {
   const addTripExpense = useSelector((state: AppStatDto) => state.trip.addTripExpense)
   const [selectedExpense, setSelectedExpense] = useState<TripExpenseData>(INITIAL_EXPENSE_FORM_STATE)
   const deleteTripExpense = useSelector((state: AppStatDto) => state.trip.deleteTripExpense)
-
+  const [isLoad, setIsLoad] = useState(true);
 
   const INITIAL_FORM_STATE: TripSummaryData = {
     _id: tripHeader._id,
@@ -141,6 +142,12 @@ const Tab3: React.FC = () => {
       closeModal()
       history.push({pathname: "/tab1" })
     }
+
+    if (deleteTrip.isLoading === true) {
+      setIsLoad(true)
+    }else if (deleteTrip.isLoading === false) {
+      setIsLoad(false)
+    }
   }, [deleteTrip.status])
 
   React.useEffect(() => {
@@ -153,6 +160,12 @@ const Tab3: React.FC = () => {
       tripExpenseList.data.forEach((item) => item.items.forEach((item1:any) => balanceTemp -= item1.amount))
       setBalance(balanceTemp)
     }
+
+    if (addTrip.isLoading === true) {
+      setIsLoad(true)
+    }else if (addTrip.isLoading === false) {
+      setIsLoad(false)
+    }
   }, [addTrip.status])
 
   React.useEffect(() => {
@@ -160,6 +173,13 @@ const Tab3: React.FC = () => {
       dispatch(tripActions.getTripExpenses(tripHeader._id) )
       setIsAddOpen(false)
       setIsExpensEditOpen(false)
+      presentToast('Saved Successfully','top', 'success')
+    }
+
+    if (addTripExpense.isLoading === true) {
+      setIsLoad(true)
+    }else if (addTripExpense.isLoading === false) {
+      setIsLoad(false)
     }
   }, [addTripExpense.status])
 
@@ -169,6 +189,12 @@ const Tab3: React.FC = () => {
       tripExpenseList.data.forEach((item) => item.items.forEach((item1:any) => balanceTemp -= item1.amount))
       setBalance(balanceTemp)
     }
+
+    if (tripExpenseList.isLoading === true) {
+      setIsLoad(true)
+    }else if (tripExpenseList.isLoading === false) {
+      setIsLoad(false)
+    }
   }, [tripExpenseList.status])
 
   React.useEffect(() => {
@@ -176,6 +202,12 @@ const Tab3: React.FC = () => {
       dispatch(tripActions.getTripExpenses(tripHeader._id) )
       setIsAddOpen(false)
       setIsExpensEditOpen(false)
+    }
+
+    if (deleteTripExpense.isLoading === true) {
+      setIsLoad(true)
+    }else if (deleteTripExpense.isLoading === false) {
+      setIsLoad(false)
     }
   }, [deleteTripExpense.status])
 
@@ -203,16 +235,24 @@ const Tab3: React.FC = () => {
   }
 
   function onAddAccept(e:any){
-    e.preventDefault()
-    const payload: TripExpenseData = {
-      _id: tripExpenseFormData._id,
-      description: tripExpenseFormData.description,
-      date: tripExpenseFormData.date,
-      amount: tripExpenseFormData.amount,
-      trip: tripHeader._id
+    if(tripExpenseFormData.date === ''){
+      const d = new Date();
+      tripExpenseFormData.date = d.toString();
     }
-    dispatch(tripActions.saveUpdateTripExpense(payload))
-    presentToast('Saved Successfully','top', 'success')
+    if(tripExpenseFormData.description === '' || tripExpenseFormData.amount <1  ){
+      presentToast('Invalid data','top', 'danger')
+    }
+    else{
+      e.preventDefault()
+      const payload: TripExpenseData = {
+        _id: tripExpenseFormData._id,
+        description: tripExpenseFormData.description,
+        date: tripExpenseFormData.date,
+        amount: tripExpenseFormData.amount,
+        trip: tripHeader._id
+      }
+      dispatch(tripActions.saveUpdateTripExpense(payload))
+    }
   }
 
   function onEditAccept(e:any){ 
@@ -288,7 +328,6 @@ const Tab3: React.FC = () => {
       trip: selectedExpense.trip
     }
     dispatch(tripActions.saveUpdateTripExpense(payload))
-    presentToast('Saved Successfully','top', 'success')
   }
 
   function onExpenseDeleteAccept(item:TripExpenseData){
@@ -297,230 +336,230 @@ const Tab3: React.FC = () => {
   }
 
   return (
-    <IonPage style={{backgroundColor:'lightblue'}}>
-      <IonHeader>
+    <IonPage>
+      <IonHeader  >
         <IonToolbar>
-          {/* <IonButtons slot="start">
-            <IonBackButton></IonBackButton>
-          </IonButtons> */}
           <IonTitle>Trips</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
+      {
+          isLoad
+          ?
+          <div className="loader">
+              <GridLoader color="#52ffe4" />
+          </div>
+          :
+          <>
+          <IonCard>
+            <IonCardHeader className="ion-text-center">
+              <IonCardTitle>{tripHeader['name']} Trip</IonCardTitle>
+              <IonCardSubtitle>
+                    {tripHeader['fromDate'].split("T")[0]}
+                    <IonIcon icon={arrowForwardOutline} className="cardIconClr" size="small" style={{marginBottom:"-4px", marginLeft:"10px", marginRight:"10px"}}></IonIcon> 
+                    {tripHeader['toDate'].split("T")[0]}
+                  </IonCardSubtitle>
+            </IonCardHeader>
 
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Trips</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+            <IonCardContent style={{marginTop:'15px', marginBottom:'15px'}}>
+              <IonBadge style={{position:'absolute', bottom:'5px', left:'5x'}}><span className="cardBudget">Budget: </span>{tripHeader['budget']}</IonBadge>
+              <IonBadge  style={{position:'absolute', bottom:'5px', right:'5px'}}><span className="cardBudget">Balance: </span>{balance}</IonBadge>
+            </IonCardContent>
 
-        <IonCard>
-          <IonCardHeader className="ion-text-center">
-            <IonCardTitle>{tripHeader['name']} Trip</IonCardTitle>
-            <IonCardSubtitle>
-                  {tripHeader['fromDate'].split("T")[0]}
-                  <IonIcon icon={arrowForwardOutline} className="cardIconClr" size="small" style={{marginBottom:"-4px", marginLeft:"10px", marginRight:"10px"}}></IonIcon> 
-                  {tripHeader['toDate'].split("T")[0]}
-                </IonCardSubtitle>
-          </IonCardHeader>
+            <IonButton onClick={() => onEditClick()} style={{position:'absolute', top:'5px', right:'0px'}} fill="clear" className="buttonClr"><IonIcon slot="icon-only" icon={settings}></IonIcon></IonButton>
+          </IonCard>
 
-          <IonCardContent style={{marginTop:'15px', marginBottom:'15px'}}>
-            <IonBadge style={{position:'absolute', bottom:'5px', left:'0px'}}><span className="cardBudget">Budget: </span>{tripHeader['budget']}</IonBadge>
-            <IonBadge  style={{position:'absolute', bottom:'5px', right:'0px'}}><span className="cardBudget">Balance: </span>{balance}</IonBadge>
-          </IonCardContent>
+          {
+            tripExpenseList.data.map((dateItem) => {
+              return <IonList key = {dateItem.date} style={{marginLeft:'20px', marginRight:'20px', marginBottom:'10px'}}>
+              <IonListHeader lines="inset" onClick={()=> onClickExpand(dateItem.date)}>
+                <IonLabel>{dateItem.date}</IonLabel>
+              </IonListHeader>
+              {dateItem.items.map((item) => {
+                if(showDate === dateItem.date && isShow){
+                  return <IonItemSliding  key = {item._id}>      
+                  <IonItem>
+                    <IonLabel>{item.description}</IonLabel>
+                    <IonLabel slot="end">{item.amount}</IonLabel>
+                  </IonItem>
+          
+                  <IonItemOptions side="end">
+                    <IonItemOption onClick={() => onExpenseEditClick(item)}>
+                      <IonIcon slot="icon-only" icon={createOutline} ></IonIcon>
+                    </IonItemOption>
+                    <IonItemOption color="danger"
+                      onClick={() =>
+                        presentAlert({
+                          header: 'Are you Sure ?',
+                          buttons: [
+                            {
+                              text: 'Cancel',
+                              role: 'cancel',
+                              handler: () => {
+                                // setHandlerMessage('Alert canceled');
+                              },
+                            },
+                            {
+                              text: 'OK',
+                              role: 'confirm',
+                              handler: () => {
+                                onExpenseDeleteAccept(item)
+                                // setHandlerMessage('Alert confirmed');
+                              },
+                            },
+                          ],
+                          // onDidDismiss: (e: CustomEvent) => setRoleMessage(`Dismissed with role: ${e.detail.role}`),
+                        })
+                      }>
+                      <IonIcon slot="icon-only" icon={trash} 
+                      ></IonIcon>
+                    </IonItemOption>
+                  </IonItemOptions>
+                </IonItemSliding>
+                }
+              })}
+            </IonList>
+            })
+          }
 
-          <IonButton onClick={() => onEditClick()} style={{position:'absolute', top:'5px', right:'0px'}} fill="clear" className="buttonClr"><IonIcon slot="icon-only" icon={settings}></IonIcon></IonButton>
-        </IonCard>
+          <IonFab hidden={isShow} style={{position:'fixed', bottom:'50px', right:'30px'}}>
+            <IonFabButton onClick={() => onAddClick()}>
+              <IonIcon icon={add} ></IonIcon>
+            </IonFabButton>
+          </IonFab>
 
-        {
-          tripExpenseList.data.map((dateItem) => {
-            return <IonList key = {dateItem.date}>
-            <IonListHeader lines="inset" onClick={()=> onClickExpand(dateItem.date)}>
-              <IonLabel>{dateItem.date}</IonLabel>
-            </IonListHeader>
-            {dateItem.items.map((item) => {
-              if(showDate === dateItem.date && isShow){
-                return <IonItemSliding  key = {item._id}>      
+          <IonFab hidden={isShow}  style={{position:'fixed', bottom:'50px', left:'30px'}}>
+            <IonFabButton onClick={() => generatePDF(tripExpenseList.data, tripHeader['name'])}>
+              <IonIcon icon={downloadSharp}></IonIcon>
+            </IonFabButton>
+          </IonFab>
+
+          <IonModal isOpen={isAddOpen} className="modal-wrapper">
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>Add</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => closeModal()}>Close</IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <IonList>
                 <IonItem>
-                  <IonLabel>{item.description}</IonLabel>
-                  <IonLabel slot="end">{item.amount}</IonLabel>
-                </IonItem>
+                  <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>Date</IonLabel>
+                  <IonDatetimeButton  onClick={()=>setIsDateModalOpen(true)} datetime="datetime2" style={{marginTop:'10px'}}></IonDatetimeButton>
         
-                <IonItemOptions side="end">
-                  <IonItemOption onClick={() => onExpenseEditClick(item)}>
-                    <IonIcon slot="icon-only" icon={createOutline} ></IonIcon>
-                  </IonItemOption>
-                  <IonItemOption color="danger"
-                    onClick={() =>
-                      presentAlert({
-                        header: 'Are you Sure ?',
-                        buttons: [
-                          {
-                            text: 'Cancel',
-                            role: 'cancel',
-                            handler: () => {
-                              // setHandlerMessage('Alert canceled');
-                            },
-                          },
-                          {
-                            text: 'OK',
-                            role: 'confirm',
-                            handler: () => {
-                              onExpenseDeleteAccept(item)
-                              // setHandlerMessage('Alert confirmed');
-                            },
-                          },
-                        ],
-                        // onDidDismiss: (e: CustomEvent) => setRoleMessage(`Dismissed with role: ${e.detail.role}`),
-                      })
-                    }>
-                    <IonIcon slot="icon-only" icon={trash} 
-                    ></IonIcon>
-                  </IonItemOption>
-                </IonItemOptions>
-              </IonItemSliding>
-              }
-            })}
-          </IonList>
-          })
-        }
+                  <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
+                    <IonDatetime value={tripExpenseFormData.date} id="datetime2" name='date' onIonChange={(e: any) => handleChange(e)} ></IonDatetime>
+                  </IonModal>
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="stacked" className="addLabel">Description</IonLabel>
+                  <IonInput clearInput={true} name='description' onIonInput={(e: any) => handleChange(e)} value={tripExpenseFormData.description} ></IonInput>
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="stacked" className="addLabel">Amount</IonLabel>
+                  <IonInput clearInput={true} type="number"  name='amount' onIonInput={(e: any) => handleChange(e)} value={tripExpenseFormData.amount} ></IonInput>
+                </IonItem>
+              </IonList>
+              <IonButton expand="block" className="footer" onClick={(e:any) => onAddAccept(e)}>Save</IonButton>
+            </IonContent>
+          </IonModal>
 
-        <IonFab style={{position:'absolute', bottom:'100px', right:'30px'}}>
-          <IonFabButton onClick={() => onAddClick()}>
-            <IonIcon icon={add} ></IonIcon>
-          </IonFabButton>
-        </IonFab>
-
-        <IonFab style={{position:'absolute', bottom:'100px', left:'30px'}}>
-          <IonFabButton onClick={() => generatePDF(tripExpenseList.data, 'Kandy')}>
-            <IonIcon icon={downloadSharp}></IonIcon>
-          </IonFabButton>
-        </IonFab>
-
-        <IonModal isOpen={isAddOpen} className="modal-wrapper">
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Add</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => closeModal()}>Close</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonList>
-              <IonItem>
-                <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>Date</IonLabel>
-                <IonDatetimeButton  onClick={()=>setIsDateModalOpen(true)} datetime="datetime2" style={{marginTop:'10px'}}></IonDatetimeButton>
-      
-                <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
-                  <IonDatetime value={tripExpenseFormData.date} id="datetime2" name='date' onIonChange={(e: any) => handleChange(e)} ></IonDatetime>
-                </IonModal>
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked" className="addLabel">Description</IonLabel>
-                <IonInput clearInput={true} name='description' onIonInput={(e: any) => handleChange(e)} value={tripExpenseFormData.description} ></IonInput>
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked" className="addLabel">Amount</IonLabel>
-                <IonInput clearInput={true} type="number"  name='amount' onIonInput={(e: any) => handleChange(e)} value={tripExpenseFormData.amount} ></IonInput>
-              </IonItem>
-            </IonList>
-            <IonButton expand="block" className="footer" onClick={(e:any) => onAddAccept(e)}>Save</IonButton>
-          </IonContent>
-        </IonModal>
-
-        <IonModal isOpen={isEditOpen} className="modal-wrapper">
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Settings</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => closeModal()}>Close</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonList>
-              <IonItem>
-                <IonLabel position="stacked" className="addLabel">Trip Name</IonLabel>
-                <IonInput clearInput={true} name='name' onIonInput={(e: any) => settingsHandleChange(e)} value={tripFormData.name}></IonInput>
-              </IonItem>
-              <IonItem>
-                <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>From Date</IonLabel>
-                <IonDatetimeButton datetime="datetime" style={{marginTop:'10px'}}></IonDatetimeButton>
-      
-                <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
-                  <IonDatetime value={tripFormData.fromDate} id="datetime" name='fromDate' onIonChange={(e: any) => settingsHandleChange(e)} ></IonDatetime>
-                </IonModal>
-              </IonItem>
-              <IonItem>
-                <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>To Date</IonLabel>
-                <IonDatetimeButton  onClick={()=>setIsDateModalOpen(true)} datetime="datetime1" style={{marginTop:'10px'}}></IonDatetimeButton>
-      
-                <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
-                  <IonDatetime value={tripFormData.toDate} id="datetime1" name='toDate' onIonChange={(e: any) => settingsHandleChange(e)}></IonDatetime>
-                </IonModal>
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked" className="addLabel">Budget</IonLabel>
-                <IonInput clearInput={true} type="number" name='budget' onIonInput={(e: any) => settingsHandleChange(e)} value={tripFormData.budget} ></IonInput>
-              </IonItem>
-            </IonList>
-            <IonButton expand="block" className="footer" onClick={(e:any)=>onEditAccept(e)}>Edit</IonButton>
-            {/* <IonButton expand="block" color="danger" >Delete</IonButton> */}
-            <IonButton expand="block" color="danger"
-              onClick={() =>
-                presentAlert({
-                  header: 'Are you Sure ?',
-                  buttons: [
-                    {
-                      text: 'Cancel',
-                      role: 'cancel',
-                      handler: () => {
-                        // setHandlerMessage('Alert canceled');
+          <IonModal isOpen={isEditOpen} className="modal-wrapper">
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>Settings</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => closeModal()}>Close</IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <IonList>
+                <IonItem>
+                  <IonLabel position="stacked" className="addLabel">Trip Name</IonLabel>
+                  <IonInput clearInput={true} name='name' onIonInput={(e: any) => settingsHandleChange(e)} value={tripFormData.name}></IonInput>
+                </IonItem>
+                <IonItem>
+                  <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>From Date</IonLabel>
+                  <IonDatetimeButton datetime="datetime" style={{marginTop:'10px'}}></IonDatetimeButton>
+        
+                  <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
+                    <IonDatetime value={tripFormData.fromDate} id="datetime" name='fromDate' onIonChange={(e: any) => settingsHandleChange(e)} ></IonDatetime>
+                  </IonModal>
+                </IonItem>
+                <IonItem>
+                  <IonLabel className="addLabel" position="stacked" style={isDateModalOpen?{color:"#52ffe4"}:{}}>To Date</IonLabel>
+                  <IonDatetimeButton  onClick={()=>setIsDateModalOpen(true)} datetime="datetime1" style={{marginTop:'10px'}}></IonDatetimeButton>
+        
+                  <IonModal keepContentsMounted={true} ref={modal} onWillDismiss={(ev) => onWillDismiss(ev)}>
+                    <IonDatetime value={tripFormData.toDate} id="datetime1" name='toDate' onIonChange={(e: any) => settingsHandleChange(e)}></IonDatetime>
+                  </IonModal>
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="stacked" className="addLabel">Budget</IonLabel>
+                  <IonInput clearInput={true} type="number" name='budget' onIonInput={(e: any) => settingsHandleChange(e)} value={tripFormData.budget} ></IonInput>
+                </IonItem>
+              </IonList>
+              <IonButton expand="block" className="footer" onClick={(e:any)=>onEditAccept(e)}>Edit</IonButton>
+              {/* <IonButton expand="block" color="danger" >Delete</IonButton> */}
+              <IonButton expand="block" color="danger"
+                onClick={() =>
+                  presentAlert({
+                    header: 'Are you Sure ?',
+                    buttons: [
+                      {
+                        text: 'Cancel',
+                        role: 'cancel',
+                        handler: () => {
+                          // setHandlerMessage('Alert canceled');
+                        },
                       },
-                    },
-                    {
-                      text: 'OK',
-                      role: 'confirm',
-                      handler: () => {
-                        onDeleteAccept()
-                        // setHandlerMessage('Alert confirmed');
+                      {
+                        text: 'OK',
+                        role: 'confirm',
+                        handler: () => {
+                          onDeleteAccept()
+                          // setHandlerMessage('Alert confirmed');
+                        },
                       },
-                    },
-                  ],
-                  // onDidDismiss: (e: CustomEvent) => setRoleMessage(`Dismissed with role: ${e.detail.role}`),
-                })
-              }
-            >
-              Delete
-            </IonButton>
-          </IonContent>
+                    ],
+                    // onDidDismiss: (e: CustomEvent) => setRoleMessage(`Dismissed with role: ${e.detail.role}`),
+                  })
+                }
+              >
+                Delete
+              </IonButton>
+            </IonContent>
 
-        </IonModal>
+          </IonModal>
 
-        <IonModal isOpen={isExpenseEditOpen} className="modal-wrapper">
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Edit</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => closeModal()}>Close</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonList> 
-              <IonItem>
-                <IonLabel position="stacked" className="addLabel">Description</IonLabel>
-                <IonInput clearInput={true} name="description" value={selectedExpense.description}  onIonInput={(e: any) => expenseHandleChange(e)}></IonInput>
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked" className="addLabel">Amount</IonLabel>
-                <IonInput clearInput={true} type="number" name="amount" value={selectedExpense.amount}  onIonInput={(e: any) => expenseHandleChange(e)}></IonInput>
-              </IonItem>
-            </IonList>
-            <IonButton expand="block" className="footer" onClick={(e:any) => onExpenseEditAcceptk(e)}>Save</IonButton>
-          </IonContent>
-        </IonModal>
+          <IonModal isOpen={isExpenseEditOpen} className="modal-wrapper">
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>Edit</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => closeModal()}>Close</IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <IonList> 
+                <IonItem>
+                  <IonLabel position="stacked" className="addLabel">Description</IonLabel>
+                  <IonInput clearInput={true} name="description" value={selectedExpense.description}  onIonInput={(e: any) => expenseHandleChange(e)}></IonInput>
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="stacked" className="addLabel">Amount</IonLabel>
+                  <IonInput clearInput={true} type="number" name="amount" value={selectedExpense.amount}  onIonInput={(e: any) => expenseHandleChange(e)}></IonInput>
+                </IonItem>
+              </IonList>
+              <IonButton expand="block" className="footer" onClick={(e:any) => onExpenseEditAcceptk(e)}>Save</IonButton>
+            </IonContent>
+          </IonModal>
+          </>
+      }
       </IonContent>
     </IonPage>
   );

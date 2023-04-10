@@ -20,3 +20,10 @@ ion-card {
   ion-icon .cardIconClr {
     color: #9efff0;
   }
+
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top:50%; 
+  }
