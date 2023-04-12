@@ -1,4 +1,5 @@
 import { TripSummaryData, TripExpenseDataSet, TripExpenseData } from './TripSummaryData.models'
+import { AuthenticationData } from './Authentication.models'
 import { ACTION_STATUS } from '../constants/app.constants'
 
 export interface  TripSummaryStateDto {
@@ -32,6 +33,16 @@ export interface  TripSummaryStateDto {
     }
 }
 
+export interface  AuthenticationStateDto {
+    authData: {
+        isLoading: boolean;
+        status: ACTION_STATUS | null;
+        data: AuthenticationData
+    }
+}
+
+
 export interface AppStatDto {
     trip: TripSummaryStateDto
+    authentication : AuthenticationStateDto
 }

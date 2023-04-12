@@ -3,6 +3,10 @@ ion-content{
     --ion-text-color: #ffffff;  
 }
 
+ion-content.background{
+    --background:  url("../../public/assets/bg1.jpg") no-repeat center center / cover;
+}
+
 ion-list-header {
     --background: #404040;
     --color: #fff;
@@ -55,12 +59,23 @@ ion-item.item-has-focus {
     --highlight-background: #52ffe4;
 }  
 
-.footer {
-    /* position:fixed; */
-    /* bottom:0;
-    height:50px; */
-    /* background: #52ffe4 ; */
+.footer { 
     --color: #000000f8;
     --background: #52ffe4;
  } 
  
+ .loginLabel {
+    font-size: 3em;
+    font-family: Gabriola;
+    color: #52ffe4;
+}
+
+.tab-selected{
+    color: #17a2b8;
+}
+
+.dateLabel {
+    font-size: 0.75em;
+}
+
+  

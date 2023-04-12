@@ -165,7 +165,7 @@ const Tab1: React.FC = () => {
               })
             }
 
-            <IonFab style={{position:'fixed', bottom:'50px', right:'30px'}}>
+            <IonFab style={{position:'fixed', bottom:'05vh', right:'30px'}}>
               <IonFabButton onClick={() => onAddClick()}>
                 <IonIcon icon={add} ></IonIcon>
               </IonFabButton>

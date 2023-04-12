@@ -5,7 +5,7 @@ import { IonIcon} from '@ionic/react';
 import { createOutline, arrowForwardOutline, trash, settings, downloadSharp, add } from 'ionicons/icons';
 import './Tab3.css';
 import { IonButtons, IonButton, IonModal} from '@ionic/react';
-import { IonBackButton, IonItem, IonLabel } from '@ionic/react';
+import {  IonItem, IonLabel } from '@ionic/react';
 import { IonItemOption, IonItemOptions, IonItemSliding, IonInput } from '@ionic/react';
 import { IonBadge, IonFab, IonFabButton, IonDatetime, IonDatetimeButton, } from '@ionic/react';
 import { IonList, useIonAlert, useIonToast } from '@ionic/react';
@@ -14,56 +14,14 @@ import generatePDF from "./reportGenerator";
 import { OverlayEventDetail } from '@ionic/core/components';
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from "react-router-dom";
-import { AppStatDto, TripSummaryData, TripExpenseDataSet, TripExpenseData } from '../models'
+import { AppStatDto, TripSummaryData, TripExpenseData } from '../models'
 import {useHistory} from 'react-router-dom';
 import { ACTION_STATUS } from '../constants'
 import { tripActions } from '../redux/actions/trip.action';
 import GridLoader from "react-spinners/ClipLoader";
 
 const Tab3: React.FC = () => {
-  
-  type TripDataDateWise = {
-    date: string;
-    items: TripExpenseData1[];
-  }; 
-
-  type TripExpenseData1 = {
-    id: string;
-    date: string;
-    description: string;
-    amount: number;
-  };  
-
-  const data: TripDataDateWise[] = [
-    {
-      date:'2018-10-31',
-      items: [
-        {
-          id: '1',
-          date: '2018-10-31',
-          description: 'test1',
-          amount: 1000
-        },
-        {
-          id: '2',
-          date: '2018-10-31',
-          description: 'test2',
-          amount: 500
-        }
-      ]
-    },
-    {
-      date:'2018-11-31',
-      items: [{
-        id: '3',
-        date: '2018-05-30',
-        description: 'test3test3test3test3test3',
-        amount: 300
-      }]
-    }
-    
-  ]; 
-
+ 
   const INITIAL_TripHeader: TripSummaryData = {
     _id: '',
     name: '',
@@ -174,6 +132,7 @@ const Tab3: React.FC = () => {
       setIsAddOpen(false)
       setIsExpensEditOpen(false)
       presentToast('Saved Successfully','top', 'success')
+      setTripExpenseFormData(INITIAL_EXPENSE_FORM_STATE)
     }
 
     if (addTripExpense.isLoading === true) {
@@ -239,6 +198,11 @@ const Tab3: React.FC = () => {
       const d = new Date();
       tripExpenseFormData.date = d.toString();
     }
+    else{
+      const res = tripExpenseFormData.date.split('+')[0]
+      tripExpenseFormData.date = res + '.000Z'
+    }
+
     if(tripExpenseFormData.description === '' || tripExpenseFormData.amount <1  ){
       presentToast('Invalid data','top', 'danger')
     }
@@ -256,6 +220,7 @@ const Tab3: React.FC = () => {
   }
 
   function onEditAccept(e:any){ 
+
     e.preventDefault()
     const payload: TripSummaryData = {
       _id: tripFormData._id,
@@ -373,7 +338,7 @@ const Tab3: React.FC = () => {
             tripExpenseList.data.map((dateItem) => {
               return <IonList key = {dateItem.date} style={{marginLeft:'20px', marginRight:'20px', marginBottom:'10px'}}>
               <IonListHeader lines="inset" onClick={()=> onClickExpand(dateItem.date)}>
-                <IonLabel>{dateItem.date}</IonLabel>
+                <IonLabel className="dateLabel">{dateItem.date}</IonLabel>
               </IonListHeader>
               {dateItem.items.map((item) => {
                 if(showDate === dateItem.date && isShow){
@@ -422,13 +387,13 @@ const Tab3: React.FC = () => {
             })
           }
 
-          <IonFab hidden={isShow} style={{position:'fixed', bottom:'50px', right:'30px'}}>
+          <IonFab hidden={isShow} style={{position:'fixed', bottom:'05vh', right:'30px'}}>
             <IonFabButton onClick={() => onAddClick()}>
               <IonIcon icon={add} ></IonIcon>
             </IonFabButton>
           </IonFab>
 
-          <IonFab hidden={isShow}  style={{position:'fixed', bottom:'50px', left:'30px'}}>
+          <IonFab hidden={isShow}  style={{position:'fixed', bottom:'05vh', left:'30px'}}>
             <IonFabButton onClick={() => generatePDF(tripExpenseList.data, tripHeader['name'])}>
               <IonIcon icon={downloadSharp}></IonIcon>
             </IonFabButton>
