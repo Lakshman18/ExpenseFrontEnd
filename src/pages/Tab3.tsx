@@ -338,7 +338,7 @@ const Tab3: React.FC = () => {
             tripExpenseList.data.map((dateItem) => {
               return <IonList key = {dateItem.date} style={{marginLeft:'20px', marginRight:'20px', marginBottom:'10px'}}>
               <IonListHeader lines="inset" onClick={()=> onClickExpand(dateItem.date)}>
-                <IonLabel className="dateLabel">{dateItem.date}</IonLabel>
+                <IonLabel style={{marginTop:'auto', marginBottom:'auto'}} className="dateLabel">{dateItem.date}</IonLabel>
               </IonListHeader>
               {dateItem.items.map((item) => {
                 if(showDate === dateItem.date && isShow){
@@ -387,13 +387,13 @@ const Tab3: React.FC = () => {
             })
           }
 
-          <IonFab hidden={isShow} style={{position:'fixed', bottom:'05vh', right:'30px'}}>
+          <IonFab hidden={isShow} style={{position:'fixed', bottom:'7vh', right:'30px'}}>
             <IonFabButton onClick={() => onAddClick()}>
               <IonIcon icon={add} ></IonIcon>
             </IonFabButton>
           </IonFab>
 
-          <IonFab hidden={isShow}  style={{position:'fixed', bottom:'05vh', left:'30px'}}>
+          <IonFab hidden={isShow}  style={{position:'fixed', bottom:'7vh', left:'30px'}}>
             <IonFabButton onClick={() => generatePDF(tripExpenseList.data, tripHeader['name'])}>
               <IonIcon icon={downloadSharp}></IonIcon>
             </IonFabButton>
