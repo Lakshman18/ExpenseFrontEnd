@@ -84,6 +84,9 @@ ion-item.item-has-focus {
     left:50%;
     transform: translate(-50%,-50%);
 }
- 
+
+ion-toolbar{
+    --color: #FFFFFF; 
+}
 
   
