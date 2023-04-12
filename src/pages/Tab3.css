@@ -78,4 +78,12 @@ ion-item.item-has-focus {
     font-size: 0.75em;
 }
 
+.centerContent {
+    position: fixed;
+    top: 40%;
+    left:50%;
+    transform: translate(-50%,-50%);
+}
+ 
+
   

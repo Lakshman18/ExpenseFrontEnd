@@ -17,11 +17,11 @@ const Login: React.FC = () => {
     <IonPage> 
       <IonContent fullscreen className="background">
       
-      <div className="d-flex justify-content-center" style={{marginTop:'25vh'}}>
+      <div className="centerContent"  >
         <IonImg style={{width:'12em', height:'12em'}} src="assets/logo.svg" ></IonImg>
+        <IonLabel className=" loginLabel d-flex justify-content-center">EXPENSO</IonLabel>
       </div>
 
-      <IonLabel className="loginLabel d-flex justify-content-center">EXPENSO</IonLabel>
 
       <div className="row" style={{bottom:'10vh', width:'100%', marginLeft:'auto', marginRight:'auto', position:'fixed'}}>
         <div className="col-md-3 d-flex justify-content-center"  >
