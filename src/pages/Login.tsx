@@ -19,7 +19,7 @@ const Login: React.FC = () => {
       
       <div className="centerContent"  >
         <IonImg style={{width:'12em', height:'12em'}} src="assets/logo.svg" ></IonImg>
-        <IonLabel className=" loginLabel d-flex justify-content-center">EXPENSO</IonLabel>
+        <IonLabel className=" loginLabel d-flex justify-content-center">COSTOSA</IonLabel>
       </div>
 
 
