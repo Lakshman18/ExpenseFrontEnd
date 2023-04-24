@@ -93,4 +93,13 @@ ion-toolbar{
     color:#FFFFFF;
 } */
 
+ion-col {
+    background-color: #135d54;
+    border: solid 1px #fff;
+    color: #fff;
+    text-align: center;
+}
   
+.DownloaduttonClr{
+    --background: #083f38;
+}
