@@ -22,3 +22,4 @@ axiosPrivateInstance.interceptors.response.use(async (response) => {
 
 export * from './trip.service'
 export * from './installment.service'
+export * from './user.service'

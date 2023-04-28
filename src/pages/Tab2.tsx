@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'; 
 import { useDispatch, useSelector } from 'react-redux'
-import { AppStatDto, InstallmentData } from '../models'
-import { installmentActions } from '../redux/actions'
+import { AppStatDto, InstallmentData, UserData } from '../models'
+import { installmentActions, userActions } from '../redux/actions'
 import { ACTION_STATUS } from '../constants'
 
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
@@ -39,6 +39,7 @@ const Tab2: React.FC = () => {
   const dispatch = useDispatch()
   const [present] = useIonToast();
   const [presentAlert] = useIonAlert();
+  const UserList = useSelector((state: AppStatDto) => state.user.userList)
   const InstallmentList = useSelector((state: AppStatDto) => state.installment.installmentList)
   const addInstallment = useSelector((state: AppStatDto) => state.installment.addInstallment)
   const deleteInstallment = useSelector((state: AppStatDto) => state.installment.deleteInstallment)
@@ -54,6 +55,7 @@ const Tab2: React.FC = () => {
 
   useEffect(() => {
     dispatch(installmentActions.getInstallments() )
+    dispatch(userActions.getUsers() )
   }, [])
 
   React.useEffect(() => {
@@ -70,6 +72,16 @@ const Tab2: React.FC = () => {
       
     }
   }, [InstallmentList.status])
+
+  React.useEffect(() => {
+    if (UserList.isLoading === true) {
+      setIsLoad(true)
+    }else if (UserList.isLoading === false) {
+      setIsLoad(false)
+      console.log(UserList.data)
+    } 
+
+  }, [UserList.status])
 
   React.useEffect(() => {
     if (isExist.isLoading === true) {
@@ -104,6 +116,7 @@ const Tab2: React.FC = () => {
   React.useEffect(() => {
     if (addInstallment.status === ACTION_STATUS.SUCCESS) {
       dispatch(installmentActions.getInstallments() )
+      presentToast('Saved Successfully', 'top', 'success')
       closeModal()
     }
 
@@ -394,8 +407,11 @@ const Tab2: React.FC = () => {
                 <IonItem hidden={!isCombined}>
                   <IonLabel position="stacked" className="addLabel">User</IonLabel>
                   <IonSelect aria-label="user" name='user' onIonChange={(ev:any) => handleChange(ev)} interface="popover" placeholder="Select user">
-                    <IonSelectOption value="643f61dc29c92338d71a39d4">Lakshman</IonSelectOption>
-                    <IonSelectOption value="643f61ef29c92338d71a39d6">test</IonSelectOption>
+                    {
+                      UserList.data.map((item:any) => {
+                        return <IonSelectOption value={item._id}>{item.name}</IonSelectOption>
+                      })
+                    }
                   </IonSelect>
                 </IonItem> 
 

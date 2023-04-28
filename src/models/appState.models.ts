@@ -1,5 +1,6 @@
 import { TripSummaryData, TripExpenseDataSet, TripExpenseData } from './TripSummaryData.models'
 import { InstallmentData, InstallmentDataSet } from './InstallmentData.models'
+import { UserData } from './UserData.models'
 import { AuthenticationData } from './Authentication.models'
 import { ACTION_STATUS } from '../constants/app.constants'
 
@@ -56,6 +57,15 @@ export interface  InstallmentStateDto {
     }
 }
 
+export interface  UserStateDto { 
+    userList: {
+        isLoading: boolean;
+        status: ACTION_STATUS | null;
+        data: UserData[]
+    }
+}
+
+
 
 export interface  AuthenticationStateDto {
     authData: {
@@ -69,5 +79,6 @@ export interface  AuthenticationStateDto {
 export interface AppStatDto {
     trip: TripSummaryStateDto,
     installment: InstallmentStateDto,
-    authentication : AuthenticationStateDto
+    authentication : AuthenticationStateDto,
+    user: UserStateDto
 }
