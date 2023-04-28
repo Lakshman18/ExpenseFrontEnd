@@ -110,7 +110,7 @@ const App: React.FC = () => {
               </IonTabButton>
               <IonTabButton tab="tab2" href="/tab2" >
                 <IonIcon aria-hidden="true" icon={square} />
-                <IonLabel> </IonLabel>
+                <IonLabel>Installments </IonLabel>
               </IonTabButton>
               <IonTabButton tab="tab3" href="/tab4" disabled>
                 <IonIcon aria-hidden="true" icon={square} />

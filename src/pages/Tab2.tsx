@@ -42,6 +42,7 @@ const Tab2: React.FC = () => {
   const InstallmentList = useSelector((state: AppStatDto) => state.installment.installmentList)
   const addInstallment = useSelector((state: AppStatDto) => state.installment.addInstallment)
   const deleteInstallment = useSelector((state: AppStatDto) => state.installment.deleteInstallment)
+  const isExist = useSelector((state: AppStatDto) => state.installment.isExist)
 
   const [isLoad, setIsLoad] = useState(true);
   const [showMonth, setShowMonth] = useState('');
@@ -69,6 +70,36 @@ const Tab2: React.FC = () => {
       
     }
   }, [InstallmentList.status])
+
+  React.useEffect(() => {
+    if (isExist.isLoading === true) {
+      setIsLoad(true)
+    }else if (isExist.isLoading === false) {
+      setIsLoad(false)
+    } 
+
+    if (isExist.status === ACTION_STATUS.SUCCESS) {
+      if( isExist.data === false){
+        const payload: InstallmentData = {
+          _id: installmentFormData._id,
+          name: installmentFormData.name,
+          date: installmentFormData.date,
+          amount: installmentFormData.amount,
+          perPersonAmount : !isCombined ? installmentFormData.amount/2 : installmentFormData.amount,
+          isCombined: isCombined,
+          installmentNo: installmentFormData.installmentNo,
+          user: installmentFormData.user,
+          userName: '' ,
+          paymentMethod: installmentFormData.paymentMethod
+        }
+        dispatch(installmentActions.saveUpdateInstallment(payload))
+      }
+      else{
+        presentToast('Name exists', 'top', 'danger')
+      }
+    }
+
+  }, [isExist.status])
 
   React.useEffect(() => {
     if (addInstallment.status === ACTION_STATUS.SUCCESS) {
@@ -165,21 +196,12 @@ const Tab2: React.FC = () => {
       presentToast('Invalid data','top', 'danger')
     }
     else{
-      e.preventDefault()
-      const payload: InstallmentData = {
-        _id: installmentFormData._id,
-        name: installmentFormData.name,
-        date: installmentFormData.date,
-        amount: installmentFormData.amount,
-        perPersonAmount : !isCombined ? installmentFormData.amount/2 : installmentFormData.amount,
-        isCombined: isCombined,
-        installmentNo: installmentFormData.installmentNo,
-        user: installmentFormData.user,
-        userName: '' ,
-        paymentMethod: installmentFormData.paymentMethod
-      }
-      dispatch(installmentActions.saveUpdateInstallment(payload))
+      checkIsExists(installmentFormData.name)
     }
+  }
+
+  function checkIsExists(name:string){
+    dispatch(installmentActions.isExist(name))
   }
 
   function calculations(selectedMonth:string){

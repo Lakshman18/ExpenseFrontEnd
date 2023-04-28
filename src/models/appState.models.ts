@@ -48,6 +48,11 @@ export interface  InstallmentStateDto {
     deleteInstallment: {
         isLoading: boolean;
         status: ACTION_STATUS | null;
+    },
+    isExist: {
+        isLoading: boolean;
+        status: ACTION_STATUS | null;
+        data: boolean;
     }
 }
 

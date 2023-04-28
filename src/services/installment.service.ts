@@ -15,8 +15,13 @@ const deleteInstallements = (Id: string): Promise<AxiosResponse<void>> => {
   return axios.delete('/deleteInstallements/'+Id)
 }
 
+const isExistsInstallements = (Name: string): Promise<AxiosResponse<void>> => {
+  return axios.post('/isExistsInstallements/'+Name)
+}
+
 export const installmentService = {
   getInstallments,
   createInstallments,
-  deleteInstallements
+  deleteInstallements,
+  isExistsInstallements
 }

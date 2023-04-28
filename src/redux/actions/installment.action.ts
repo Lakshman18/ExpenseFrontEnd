@@ -67,8 +67,30 @@ const deleteInstallment = (installmentId: string) => {
   }
 }
 
+const isExist = (name: string) => {
+  return (dispatch: (arg0: { type: string, data?: any, error?: string }) => void) => {
+    dispatch({ type: INSTALLMENT_ACTIONS.ISEXIST_INSTALLMENT + COMMON_ACTIONS.REQUEST })
+    installmentService.isExistsInstallements(name)
+      .then((res) => {
+        dispatch({ type: INSTALLMENT_ACTIONS.ISEXIST_INSTALLMENT + COMMON_ACTIONS.SUCCESS, data: res.data })
+      })
+      .catch((error) => {
+        // const _notifier: NotifierMessageDto = {
+        //   message: error,
+        //   options: {
+        //     variant: NOTIFIER_VARIANT.ERROR,
+        //     persist: true
+        //   }
+        // }
+        // dispatch({ type: NOTIFIER_ACTIONS.TRIGGER_NOTIFIER_MESSAGE, data: _notifier })
+        dispatch({ type: INSTALLMENT_ACTIONS.ISEXIST_INSTALLMENT + COMMON_ACTIONS.ERROR })
+      })
+  }
+}
+
 export const installmentActions = {
   getInstallments,
   saveUpdateInstallment,
-  deleteInstallment 
+  deleteInstallment,
+  isExist
 }

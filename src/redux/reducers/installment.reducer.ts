@@ -18,6 +18,11 @@ const INITIAL_STATE: InstallmentStateDto = {
     isLoading: false,
     status: null
   },
+  isExist: {
+    isLoading: false,
+    status: null,
+    data:true
+  },
 }
 const installmentReducer = (state = INITIAL_STATE, action: { type: string; data: any }): InstallmentStateDto => {
   switch (action.type) {
@@ -103,6 +108,35 @@ const installmentReducer = (state = INITIAL_STATE, action: { type: string; data:
         deleteInstallment: {
           isLoading: false,
           status: ACTION_STATUS.ERROR
+        }
+      }
+
+    // ISEXIST_INSTALLMENT
+    case INSTALLMENT_ACTIONS.ISEXIST_INSTALLMENT + COMMON_ACTIONS.REQUEST:
+      return {
+        ...state,
+        isExist: {
+          isLoading: true,
+          status: ACTION_STATUS.LOADING,
+          data:true
+        }
+      }
+    case INSTALLMENT_ACTIONS.ISEXIST_INSTALLMENT + COMMON_ACTIONS.SUCCESS:
+      return {
+        ...state,
+        isExist: {
+          isLoading: false,
+          status: ACTION_STATUS.SUCCESS,
+          data:action.data
+        }
+      }
+    case INSTALLMENT_ACTIONS.ISEXIST_INSTALLMENT + COMMON_ACTIONS.ERROR:
+      return {
+        ...state,
+        isExist: {
+          isLoading: false,
+          status: ACTION_STATUS.ERROR,
+          data:true
         }
       }
     default:
