@@ -3,8 +3,7 @@ import "jspdf-autotable";
 
 const generatePDF = (data, users, name) => { 
   const doc = new jsPDF();
-
-  const tableColumn = ["Date", "Description", "Payment Method", "Amount" ];
+  const tableColumn = ["Date", "Description", "Payment Method", "Installment No","Amount" ];
   users.map((item) => {
    return tableColumn.push(item.userName)
   })
@@ -15,13 +14,15 @@ const generatePDF = (data, users, name) => {
             row.date.split('T')[0],
             row.name,
             row.paymentMethod === 'K' ? 'KOKO' : 'MINTPAY',
+            row.installmentNo,
             row.amount,
-            row.userName === tableColumn[4] ? row.perPersonAmount : row.userName === '' ? row.perPersonAmount : 0,
-            row.userName === tableColumn[5] ? row.perPersonAmount : row.userName === '' ? row.perPersonAmount : 0
+            row.userName === tableColumn[5] ? row.perPersonAmount : row.userName === '' ? row.perPersonAmount : 0,
+            row.userName === tableColumn[6] ? row.perPersonAmount : row.userName === '' ? row.perPersonAmount : 0
           ];
         tableRows.push(rowData);
     });
   const resultsData = [
+    '',
     '',
     '',
     '',

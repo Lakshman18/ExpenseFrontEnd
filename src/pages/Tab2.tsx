@@ -78,7 +78,6 @@ const Tab2: React.FC = () => {
       setIsLoad(true)
     }else if (UserList.isLoading === false) {
       setIsLoad(false)
-      console.log(UserList.data)
     } 
 
   }, [UserList.status])
@@ -220,20 +219,27 @@ const Tab2: React.FC = () => {
   function calculations(selectedMonth:string){
     const unique:any = [];
     const userAmount:any = [];
+
+    UserList.data.map((item:any) => {
+      if(!unique.includes(item.name)){
+        let tempItem = {userName:'', amount:0}
+        tempItem.userName = item.name;
+        tempItem.amount = 0;
+        unique.push(item.name);
+        userAmount.push(tempItem)
+      }
+    })
+
+    let tempItem = {userName:'', amount:0}
+    userAmount.push(tempItem)
+
     InstallmentList.data.map((item:any) => {
       if(item.month === selectedMonth){
         item.items.map((item1:any)=>{
           let tempItem = {userName:'', amount:0}
-          if(!unique.includes(item1.userName)){
-            unique.push(item1.userName)
-            tempItem.userName = item1.userName;
-            tempItem.amount = item1.perPersonAmount;
-            userAmount.push(tempItem)
-          }
-          else{
-            var row = userAmount.filter((element:any) => element.userName === item1.userName)
+          var row = userAmount.filter((element:any) => element.userName === item1.userName)
             row[0].amount = row[0].amount + item1.perPersonAmount
-          }
+          
         })
       }
     });
@@ -246,7 +252,8 @@ const Tab2: React.FC = () => {
       }
     })
 
-    const arrayWithoutBoth = userAmount.filter((element:any) => element.userName !== '');
+    let arrayWithoutBoth = userAmount;
+    arrayWithoutBoth = userAmount.filter((element:any) => element.userName !== '');
 
     arrayWithoutBoth.map((element:any) => {
       element.amount = element.amount + bothAmount;
@@ -409,7 +416,7 @@ const Tab2: React.FC = () => {
                   <IonSelect aria-label="user" name='user' onIonChange={(ev:any) => handleChange(ev)} interface="popover" placeholder="Select user">
                     {
                       UserList.data.map((item:any) => {
-                        return <IonSelectOption value={item._id}>{item.name}</IonSelectOption>
+                        return <IonSelectOption value={item._id} key={item._id}>{item.name}</IonSelectOption>
                       })
                     }
                   </IonSelect>
